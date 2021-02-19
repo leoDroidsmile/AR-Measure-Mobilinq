@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView text;
     private SeekBar sk_height_control;
     private Button btn_save, btn_width, btn_height;
-    private ImageButton btn_share;
 
     List<AnchorNode> anchorNodes = new ArrayList<>();
 
@@ -89,7 +88,6 @@ public class MainActivity extends AppCompatActivity {
         btn_height = (Button) findViewById(R.id.btn_height);
         btn_save = (Button) findViewById(R.id.btn_save);
         btn_width = (Button) findViewById(R.id.btn_width);
-        btn_share = (ImageButton) findViewById(R.id.btn_share);
 
         sk_height_control.setEnabled(false);
 
@@ -121,24 +119,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        btn_share.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(arl_saved.size() > 0){
-                    Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-                    sharingIntent.setType("text/plain");
-                    String shareBody = "";
-                    for(String measurement : arl_saved)
-                        shareBody += measurement+"\n";
-                    shareBody = shareBody.trim();
-                    sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "AR Measurements");
-                    sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
-                    startActivity(Intent.createChooser(sharingIntent, "Share via"));
-                }
-                else
-                    Toast.makeText(MainActivity.this, "Save measurements before sharing", Toast.LENGTH_SHORT).show();
-            }
-        });
 
 
         sk_height_control.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
