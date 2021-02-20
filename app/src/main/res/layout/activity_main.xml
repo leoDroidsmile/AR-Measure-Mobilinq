@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -16,6 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="75dp"
         android:background="@color/translucent_black">
+
         <TextView
             android:id="@+id/text"
             android:layout_width="match_parent"
@@ -27,58 +30,72 @@
             android:layout_marginVertical="10dp"/>
     </LinearLayout>
 
-
-
     <SeekBar
         android:id="@+id/sk_height_control"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:layout_marginBottom="100dp"
+        android:layout_marginBottom="24dp"
+        android:layout_marginRight="100dp"
         android:min="0"
         android:max="500"
         android:enabled="false"
         android:progress="10"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_menu"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom">
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        app:backgroundTint="@color/colorAccent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/ic_baseline_menu_open_24" />
 
-        <Button
-            android:id="@+id/btn_width"
-            android:layout_width="150dp"
-            android:layout_height="75dp"
-            android:text="Width"
-            android:background="@drawable/ic_button_round_green"
-            android:textColor="@color/white"
-            android:layout_weight="1"
-            android:layout_margin="10dp"
-            android:textSize="20dp"/>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_width"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginRight="24dp"
+        android:layout_marginBottom="88dp"
+        android:rotationX="3.14"
+        android:src="@drawable/ic_baseline_width_24"
+        app:backgroundTint="@color/colorAccent"
+        app:fabSize="mini"
+        app:layout_constraintBottom_toTopOf="@+id/fab"
+        app:layout_constraintEnd_toEndOf="@+id/fab" />
 
-        <Button
-            android:id="@+id/btn_save"
-            android:layout_width="150dp"
-            android:layout_height="75dp"
-            android:text="Save"
-            android:background="@drawable/ic_button_round_orange"
-            android:textColor="@color/white"
-            android:layout_weight="1"
-            android:layout_margin="10dp"
-            android:textSize="20dp"
-            />
+    <!--Floating action button for add person-->
+    <!--Make sure that you are constraining this
+        button to the add Alarm FAB button-->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_height"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginRight="24dp"
+        android:layout_marginBottom="144dp"
+        android:src="@drawable/ic_baseline_height_24"
+        app:backgroundTint="@color/colorAccent"
+        app:fabSize="mini"
+        app:layout_constraintBottom_toTopOf="@+id/add_alarm_fab"
+        app:layout_constraintEnd_toEndOf="@+id/add_alarm_fab"
+        app:layout_constraintStart_toStartOf="@+id/add_alarm_fab" />
 
-        <Button
-            android:id="@+id/btn_height"
-            android:layout_width="150dp"
-            android:layout_height="75dp"
-            android:text="Height"
-            android:background="@drawable/ic_button_round_green"
-            android:textColor="@color/white"
-            android:layout_weight="1"
-            android:layout_margin="10dp"
-            android:textSize="20dp"
-            />
-    </LinearLayout>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_capture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginRight="24dp"
+        android:layout_marginBottom="200dp"
+        android:src="@drawable/ic_baseline_camera_alt_24"
+        app:backgroundTint="@color/colorAccent"
+        app:fabSize="mini"
+        app:layout_constraintBottom_toTopOf="@+id/add_alarm_fab"
+        app:layout_constraintEnd_toEndOf="@+id/add_alarm_fab"
+        app:layout_constraintStart_toStartOf="@+id/add_alarm_fab" />
 
-</FrameLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

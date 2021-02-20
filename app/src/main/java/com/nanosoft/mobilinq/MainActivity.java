@@ -22,6 +22,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
@@ -52,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView text;
     private SeekBar sk_height_control;
-    private Button btn_save, btn_width, btn_height;
 
     List<AnchorNode> anchorNodes = new ArrayList<>();
 
@@ -63,7 +63,9 @@ public class MainActivity extends AppCompatActivity {
 
     private String message;
 
-
+    // Manage FloatingActinButtons
+    FloatingActionButton mFabMenu, mFabWidth, mFabHeight, mFabCapture;
+    boolean mAllFabsVisible = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,42 +82,70 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
+        // Manage floating action buttons
+        mFabMenu = (FloatingActionButton) findViewById(R.id.fab_menu);
+        mFabWidth = (FloatingActionButton) findViewById(R.id.fab_width);
+        mFabHeight = (FloatingActionButton) findViewById(R.id.fab_height);
+        mFabCapture = (FloatingActionButton) findViewById(R.id.fab_capture);
+
+        mFabWidth.setVisibility(View.GONE);
+        mFabHeight.setVisibility(View.GONE);
+        mFabCapture.setVisibility(View.GONE);
+
+        mAllFabsVisible = false;
+
+        mFabMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!mAllFabsVisible) {
+                    mFabWidth.show();
+                    mFabHeight.show();
+                    mFabCapture.show();
+                }else{
+                    mFabWidth.hide();
+                    mFabHeight.hide();
+                    mFabCapture.hide();
+                }
+                mAllFabsVisible = !mAllFabsVisible;
+            }
+        });
+
+
 
         arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
         text = (TextView) findViewById(R.id.text);
 
         sk_height_control = (SeekBar) findViewById(R.id.sk_height_control);
-        btn_height = (Button) findViewById(R.id.btn_height);
-        btn_save = (Button) findViewById(R.id.btn_save);
-        btn_width = (Button) findViewById(R.id.btn_width);
-
         sk_height_control.setEnabled(false);
 
-        btn_width.setOnClickListener(new View.OnClickListener() {
+        mFabWidth.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 resetLayout();
                 measure_height = false;
                 text.setText("Click the extremes you want to measure");
+                mFabMenu.callOnClick();
             }
         });
 
-        btn_height.setOnClickListener(new View.OnClickListener() {
+        mFabHeight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 resetLayout();
                 measure_height = true;
                 text.setText("Click the base of the object you want to measure");
+                mFabMenu.callOnClick();
             }
         });
 
-        btn_save.setOnClickListener(new View.OnClickListener() {
+        mFabCapture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(fl_measurement != 0.0f)
                     saveDialog();
                 else
                     Toast.makeText(MainActivity.this, "Make a measurement before saving", Toast.LENGTH_SHORT).show();
+                mFabMenu.callOnClick();
             }
         });
 
