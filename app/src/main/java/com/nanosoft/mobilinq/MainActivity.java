@@ -8,12 +8,20 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
+import android.view.PixelCopy;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -28,11 +36,15 @@ import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
 import com.google.ar.core.Pose;
 import com.google.ar.sceneform.AnchorNode;
+import com.google.ar.sceneform.ArSceneView;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -198,6 +210,7 @@ public class MainActivity extends AppCompatActivity {
 
                     anchorNode.setParent(arFragment.getArSceneView().getScene());
 
+
                     if(!measure_height) {
                         if(anchor2 != null){
                             emptyAnchors();
@@ -229,6 +242,14 @@ public class MainActivity extends AppCompatActivity {
                     andy.select();
                     andy.getScaleController().setEnabled(false);
                 });
+
+        // Request to write external storage
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(new String[] {
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1001);
+        } else {
+
+        }
     }
 
     /**
@@ -298,6 +319,7 @@ public class MainActivity extends AppCompatActivity {
                 if(et_measure.length() != 0){
                     arl_saved.add(et_measure.getText()+": "+form_numbers.format(fl_measurement));
                     dialogInterface.dismiss();
+                    takeScreenshotAR(et_measure.getText().toString());
                 }
                 else
                     Toast.makeText(MainActivity.this, "Title can't be empty", Toast.LENGTH_SHORT).show();
@@ -329,5 +351,98 @@ public class MainActivity extends AppCompatActivity {
             n.setParent(null);
             n = null;
         }
+    }
+
+    // Take screen of Main fragement Scene
+    private void takeScreenshot(String filename) {
+        try {
+            // image naming and path  to include sd card  appending name you choose for file
+            String mPath = Environment.getExternalStorageDirectory().toString() + "/" + filename + ".jpg";
+
+            // create bitmap screen capture
+            View v1 = getWindow().getDecorView().getRootView();
+            v1.setDrawingCacheEnabled(true);
+            Bitmap bitmap = Bitmap.createBitmap(v1.getDrawingCache());
+            v1.setDrawingCacheEnabled(false);
+
+            File imageFile = new File(mPath);
+
+            FileOutputStream outputStream = new FileOutputStream(imageFile);
+            int quality = 100;
+            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
+            outputStream.flush();
+            outputStream.close();
+
+//            openScreenshot(imageFile);
+        } catch (Throwable e) {
+            // Several error may come out with file handling or DOM
+            e.printStackTrace();
+        }
+    }
+
+    // Take screen of AR fragement Scene
+    private void takeScreenshotAR(String filename) {
+        // image naming and path  to include sd card  appending name you choose for file
+        String mPath = Environment.getExternalStorageDirectory().toString() + "/" + filename + ".jpg";
+
+        ArSceneView view = arFragment.getArSceneView();
+
+        // Create a bitmap the size of the scene view.
+        Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(),
+                Bitmap.Config.ARGB_8888);
+
+        // Create a handler thread to offload the processing of the image.
+        final HandlerThread handlerThread = new HandlerThread("PixelCopier");
+        handlerThread.start();
+        // Make the request to copy.
+        PixelCopy.request(view, bitmap, (copyResult) -> {
+            if (copyResult == PixelCopy.SUCCESS) {
+                try {
+                    // Get bitmap for measurement text
+                    View v1 = getWindow().getDecorView().getRootView().findViewById(R.id.text);
+                    v1.setDrawingCacheEnabled(true);
+                    Bitmap bitmapText = Bitmap.createBitmap(v1.getDrawingCache());
+                    v1.setDrawingCacheEnabled(false);
+
+                    Bitmap bitmapOverlay = overlay(bitmap, bitmapText);
+                    saveBitmapToDisk(bitmapOverlay, filename);
+                } catch (IOException e) {
+                    Log.d(TAG, e.toString());
+                    return;
+                }
+//                SnackbarUtility.showSnackbarTypeLong(settingsButton, "Screenshot saved in /Pictures/Screenshots");
+                Toast.makeText(MainActivity.this, "Screenshot saved in /Pictures/Screenshots", Toast.LENGTH_LONG).show();
+            } else {
+//                SnackbarUtility.showSnackbarTypeLong(settingsButton, "Failed to take screenshot");
+                Toast.makeText(MainActivity.this, "Failed to take screenshoot", Toast.LENGTH_LONG).show();
+            }
+            handlerThread.quitSafely();
+        }, new Handler(handlerThread.getLooper()));
+    }
+
+    private Bitmap overlay(Bitmap bmp1, Bitmap bmp2) {
+        Bitmap bmOverlay = Bitmap.createBitmap(bmp1.getWidth(), bmp1.getHeight(), bmp1.getConfig());
+        Canvas canvas = new Canvas(bmOverlay);
+        canvas.drawBitmap(bmp1, new Matrix(), null);
+        canvas.drawBitmap(bmp2, new Matrix(), null);
+        return bmOverlay;
+    }
+
+    public void saveBitmapToDisk(Bitmap bitmap, String filename) throws IOException {
+        try{
+            File videoDirectory = new File(Environment.getExternalStorageDirectory() + File.separator + "Screenshots");
+
+            if(!videoDirectory.exists() && !videoDirectory.isDirectory())
+                videoDirectory.mkdir();
+
+            File mediaFile = new File(videoDirectory, filename+".jpeg");
+            FileOutputStream fileOutputStream = new FileOutputStream(mediaFile);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+            fileOutputStream.flush();
+            fileOutputStream.close();
+        }catch(Exception e){
+            Toast.makeText(MainActivity.this, "Error writing screenshoot : " + e.toString(), Toast.LENGTH_SHORT).show();
+        }
+
     }
 }
