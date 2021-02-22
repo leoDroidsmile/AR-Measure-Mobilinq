@@ -169,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
                 upDistance = progress;
                 fl_measurement = progress/100f;
                 text.setText("Height: "+form_numbers.format(fl_measurement));
-                myanchornode.setLocalScale(new Vector3(1f, progress/10f, 1f));
+                myanchornode.setLocalScale(new Vector3(0.3f, progress/10f, 0.3f));
                 //ascend(myanchornode, upDistance);
             }
 
@@ -206,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
                     Anchor anchor = hitResult.createAnchor();
 
                     AnchorNode anchorNode = new AnchorNode(anchor);
-
+                    anchorNode.setLocalScale(new Vector3(0.3f, 0.3f, 0.3f));
 
                     anchorNode.setParent(arFragment.getArSceneView().getScene());
 
