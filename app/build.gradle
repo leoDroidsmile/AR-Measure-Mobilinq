@@ -52,3 +52,8 @@ sceneform.asset('sampledata/cubito3.fbx',
         'default',
         'sampledata/cubito3.sfa',
         'src/main/assets/cubito3')
+
+sceneform.asset('sampledata/pin.fbx',
+        'default',
+        'sampledata/pin.sfa',
+        'src/main/assets/pin')

@@ -2,12 +2,15 @@ package com.nanosoft.mobilinq;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
@@ -37,6 +40,9 @@ import com.google.ar.core.Plane;
 import com.google.ar.core.Pose;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.ArSceneView;
+import com.google.ar.sceneform.HitTestResult;
+import com.google.ar.sceneform.Node;
+import com.google.ar.sceneform.math.Quaternion;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.ux.ArFragment;
@@ -56,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
     private float upDistance = 0f;
     private ArFragment arFragment;
     private ModelRenderable andyRenderable;
+    private ModelRenderable andyRenderableCube;
     private AnchorNode myanchornode;
     private DecimalFormat form_numbers = new DecimalFormat("#0.00 m");
 
@@ -91,6 +98,21 @@ public class MainActivity extends AppCompatActivity {
             this.getSupportActionBar().hide();
         }
         catch (NullPointerException e){}
+
+        // Request to write external storage
+        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MainActivity.this, new String[] {
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1001);
+        } else {
+
+        }
+
+        // Request to write external storage
+        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MainActivity.this, new String[] {
+                    android.Manifest.permission.CAMERA}, 1002);
+        }
+
 
         setContentView(R.layout.activity_main);
 
@@ -168,8 +190,8 @@ public class MainActivity extends AppCompatActivity {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 upDistance = progress;
                 fl_measurement = progress/100f;
-                text.setText("Height: "+form_numbers.format(fl_measurement));
-                myanchornode.setLocalScale(new Vector3(0.3f, progress/10f, 0.3f));
+                text.setText("Height: " + form_numbers.format(fl_measurement));
+                myanchornode.setLocalScale(new Vector3(0.1f, progress/10f, 0.3f));
                 //ascend(myanchornode, upDistance);
             }
 
@@ -183,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         ModelRenderable.builder()
-                .setSource(this, R.raw.cubito3)
+                .setSource(this, R.raw.pin)
                 .build()
                 .thenAccept(renderable -> andyRenderable = renderable)
                 .exceptionally(
@@ -195,9 +217,22 @@ public class MainActivity extends AppCompatActivity {
                             return null;
                         });
 
+        ModelRenderable.builder()
+                .setSource(this, R.raw.cubito3)
+                .build()
+                .thenAccept(renderable -> andyRenderableCube = renderable)
+                .exceptionally(
+                        throwable -> {
+                            Toast toast =
+                                    Toast.makeText(this, "Unable to load andy renderable", Toast.LENGTH_LONG);
+                            toast.setGravity(Gravity.CENTER, 0, 0);
+                            toast.show();
+                            return null;
+                        });
+
         arFragment.setOnTapArPlaneListener(
                 (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
-                    if (andyRenderable == null) {
+                    if (andyRenderable == null || andyRenderableCube == null) {
                         return;
                     }
                     myhit = hitResult;
@@ -206,13 +241,16 @@ public class MainActivity extends AppCompatActivity {
                     Anchor anchor = hitResult.createAnchor();
 
                     AnchorNode anchorNode = new AnchorNode(anchor);
-                    anchorNode.setLocalScale(new Vector3(0.3f, 0.3f, 0.3f));
+                    if (!measure_height) {
+                        anchorNode.setLocalScale(new Vector3(1.0f, 1.0f, 1.0f));
+                    } else
+                        anchorNode.setLocalScale(new Vector3(0.1f, 0.0001f, 0.1f));
 
+                    anchorNode.setLocalRotation(Quaternion.axisAngle(new Vector3(1.0f, 0f, 0f), 90));
                     anchorNode.setParent(arFragment.getArSceneView().getScene());
 
-
-                    if(!measure_height) {
-                        if(anchor2 != null){
+                    if (!measure_height) {
+                        if (anchor2 != null) {
                             emptyAnchors();
                         }
                         if (anchor1 == null) {
@@ -224,8 +262,7 @@ public class MainActivity extends AppCompatActivity {
                                     form_numbers.format(fl_measurement));
 
                         }
-                    }
-                    else{
+                    } else {
                         emptyAnchors();
                         anchor1 = anchor;
                         text.setText("Move the slider till the cube reaches the upper base");
@@ -238,18 +275,29 @@ public class MainActivity extends AppCompatActivity {
                     // Create the transformable andy and add it to the anchor.
                     TransformableNode andy = new TransformableNode(arFragment.getTransformationSystem());
                     andy.setParent(anchorNode);
-                    andy.setRenderable(andyRenderable);
+
+                    if (!measure_height)
+                        andy.setRenderable(andyRenderable);
+                    else
+                        andy.setRenderable(andyRenderableCube);
+
                     andy.select();
                     andy.getScaleController().setEnabled(false);
+                    andy.getTranslationController().setEnabled(true);
+
+                    andy.setOnTapListener(new Node.OnTapListener(){
+                        @Override
+                        public void onTap(HitTestResult hitTestResult, MotionEvent motionEvent) {
+                            Toast.makeText(MainActivity.this, "jfdlksafjdsa;", Toast.LENGTH_SHORT).show();
+                            if (anchor1 != null && anchor2 != null) {
+                                fl_measurement = getMetersBetweenAnchors(anchor1, anchor2);
+                                text.setText("Width: " +
+                                        form_numbers.format(fl_measurement));
+                            }
+                        }
+                    });
                 });
 
-        // Request to write external storage
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissions(new String[] {
-                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1001);
-        } else {
-
-        }
     }
 
     /**

@@ -19,7 +19,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="75dp"
         android:background="@color/translucent_black">
 
         <TextView
@@ -27,7 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAlignment="center"
-            android:textSize="30sp"
+            android:textSize="20sp"
             android:textColor="#fff"
             android:text="Select width or height"
             android:layout_marginVertical="10dp"/>
@@ -41,7 +40,7 @@
         android:layout_marginBottom="24dp"
         android:layout_marginRight="100dp"
         android:min="0"
-        android:max="500"
+        android:max="100"
         android:enabled="false"
         android:progress="10"/>
 
