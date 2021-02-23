@@ -37,12 +37,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:layout_marginBottom="24dp"
-        android:layout_marginRight="100dp"
+        android:layout_marginBottom="25dp"
+        android:layout_marginRight="75dp"
+        android:layout_marginLeft="25dp"
         android:min="0"
         android:max="100"
         android:enabled="false"
-        android:progress="10"/>
+        android:progress="0"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_menu"
@@ -61,6 +62,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginRight="24dp"
+        android:layout_marginLeft="24dp"
         android:layout_marginBottom="88dp"
         android:rotationX="3.14"
         android:src="@drawable/ic_baseline_width_24"
@@ -78,6 +80,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginRight="24dp"
+        android:layout_marginLeft="24dp"
         android:layout_marginBottom="144dp"
         android:src="@drawable/ic_baseline_height_24"
         app:backgroundTint="@color/colorAccent"
@@ -92,6 +95,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginRight="24dp"
+        android:layout_marginLeft="24dp"
         android:layout_marginBottom="200dp"
         android:src="@drawable/ic_baseline_camera_alt_24"
         app:backgroundTint="@color/colorAccent"

@@ -2,6 +2,8 @@ package com.nanosoft.mobilinq;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
@@ -11,6 +13,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
@@ -22,6 +25,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.PixelCopy;
@@ -29,6 +33,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -54,6 +59,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -296,8 +302,27 @@ public class MainActivity extends AppCompatActivity {
                             }
                         }
                     });
+
+                    andy.addTransformChangedListener(new Node.TransformChangedListener(){
+
+                        @Override
+                        public void onTransformChanged(Node node, Node node1) {
+                            if (anchor1 != null && anchor2 != null) {
+                                fl_measurement = getMetersBetweenAnchors(anchor1, anchor2);
+                                text.setText("Width: " +
+                                        form_numbers.format(fl_measurement));
+                            }
+                        }
+                    });
                 });
 
+
+        boolean isRightToLeft = getResources().getBoolean(R.bool.is_right_to_left);
+        if(isRightToLeft){
+            CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) sk_height_control.getLayoutParams();
+            params.setMargins(75, 0, 25, 25);
+            sk_height_control.setLayoutParams(params);
+        }
     }
 
     /**
@@ -384,7 +409,7 @@ public class MainActivity extends AppCompatActivity {
      * Set layout to its initial state
      */
     private void resetLayout(){
-        sk_height_control.setProgress(10);
+        sk_height_control.setProgress(0);
         sk_height_control.setEnabled(false);
         measure_height = false;
         emptyAnchors();
