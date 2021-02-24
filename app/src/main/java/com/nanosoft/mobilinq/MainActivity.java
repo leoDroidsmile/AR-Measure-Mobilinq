@@ -171,6 +171,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 resetLayout();
+                emptyNodes();
                 measure_height = false;
                 text.setText("Select width or height");
                 mFabMenu.callOnClick();
@@ -523,7 +524,20 @@ public class MainActivity extends AppCompatActivity {
 
     public void saveBitmapToDisk(Bitmap bitmap, String filename) throws IOException {
         try{
-            File videoDirectory = new File(Environment.getExternalStorageDirectory() + File.separator + "Screenshots");
+            File videoDirectory;
+
+            Boolean isSDPresent = android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED);
+            Boolean isSDSupportedDevice = Environment.isExternalStorageRemovable();
+
+            if(isSDSupportedDevice && isSDPresent)
+            {
+                // yes SD-card is present
+                videoDirectory = new File(Environment.getExternalStorageDirectory() + File.separator + "Screenshots");
+            }
+            else
+            {
+                videoDirectory = new File(getFilesDir() + File.separator + "Screenshots");
+            }
 
             if(!videoDirectory.exists() && !videoDirectory.isDirectory())
                 videoDirectory.mkdir();
@@ -541,8 +555,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void lineBetweenPoints(Vector3 point1, Vector3 point2) {
-        Node lineNode = new Node();
-
         /* First, find the vector extending between the two points and define a look rotation in terms of this
         Vector. */
         final Vector3 difference = Vector3.subtract(point1, point2);
