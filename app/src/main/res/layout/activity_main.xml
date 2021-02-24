@@ -57,7 +57,7 @@
         app:srcCompat="@drawable/ic_baseline_menu_open_24" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_width"
+        android:id="@+id/fab_clear"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
@@ -65,7 +65,7 @@
         android:layout_marginLeft="24dp"
         android:layout_marginBottom="88dp"
         android:rotationX="3.14"
-        android:src="@drawable/ic_baseline_width_24"
+        android:src="@drawable/ic_baseline_clear_24"
         app:backgroundTint="@color/colorAccent"
         app:fabSize="mini"
         app:layout_constraintBottom_toTopOf="@+id/fab"
@@ -75,13 +75,28 @@
     <!--Make sure that you are constraining this
         button to the add Alarm FAB button-->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_height"
+        android:id="@+id/fab_width"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginRight="24dp"
         android:layout_marginLeft="24dp"
         android:layout_marginBottom="144dp"
+        android:src="@drawable/ic_baseline_width_24"
+        app:backgroundTint="@color/colorAccent"
+        app:fabSize="mini"
+        app:layout_constraintBottom_toTopOf="@+id/add_alarm_fab"
+        app:layout_constraintEnd_toEndOf="@+id/add_alarm_fab"
+        app:layout_constraintStart_toStartOf="@+id/add_alarm_fab" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_height"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginRight="24dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginBottom="200dp"
         android:src="@drawable/ic_baseline_height_24"
         app:backgroundTint="@color/colorAccent"
         app:fabSize="mini"
@@ -96,7 +111,7 @@
         android:layout_gravity="bottom|end"
         android:layout_marginRight="24dp"
         android:layout_marginLeft="24dp"
-        android:layout_marginBottom="200dp"
+        android:layout_marginBottom="256dp"
         android:src="@drawable/ic_baseline_camera_alt_24"
         app:backgroundTint="@color/colorAccent"
         app:fabSize="mini"

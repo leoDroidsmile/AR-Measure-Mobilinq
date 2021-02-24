@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
     private String message;
 
     // Manage FloatingActinButtons
-    FloatingActionButton mFabMenu, mFabWidth, mFabHeight, mFabCapture;
+    FloatingActionButton mFabMenu, mFabWidth, mFabHeight, mFabCapture, mFabClear;
     boolean mAllFabsVisible = false;
 
     @Override
@@ -124,10 +124,12 @@ public class MainActivity extends AppCompatActivity {
 
         // Manage floating action buttons
         mFabMenu = (FloatingActionButton) findViewById(R.id.fab_menu);
+        mFabClear = (FloatingActionButton) findViewById(R.id.fab_clear);
         mFabWidth = (FloatingActionButton) findViewById(R.id.fab_width);
         mFabHeight = (FloatingActionButton) findViewById(R.id.fab_height);
         mFabCapture = (FloatingActionButton) findViewById(R.id.fab_capture);
 
+        mFabClear.setVisibility(View.GONE);
         mFabWidth.setVisibility(View.GONE);
         mFabHeight.setVisibility(View.GONE);
         mFabCapture.setVisibility(View.GONE);
@@ -138,10 +140,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (!mAllFabsVisible) {
+                    mFabClear.show();
                     mFabWidth.show();
                     mFabHeight.show();
                     mFabCapture.show();
                 }else{
+                    mFabClear.hide();
                     mFabWidth.hide();
                     mFabHeight.hide();
                     mFabCapture.hide();
@@ -157,6 +161,13 @@ public class MainActivity extends AppCompatActivity {
 
         sk_height_control = (SeekBar) findViewById(R.id.sk_height_control);
         sk_height_control.setEnabled(false);
+
+        mFabClear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mFabWidth.callOnClick();
+            }
+        });
 
         mFabWidth.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -197,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
                 upDistance = progress;
                 fl_measurement = progress/100f;
                 text.setText("Height: " + form_numbers.format(fl_measurement));
-                myanchornode.setLocalScale(new Vector3(0.1f, progress/10f, 0.3f));
+                myanchornode.setLocalScale(new Vector3(0.01f, progress/10f, 0.3f));
                 //ascend(myanchornode, upDistance);
             }
 
