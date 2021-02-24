@@ -45,11 +45,16 @@ import com.google.ar.core.Plane;
 import com.google.ar.core.Pose;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.ArSceneView;
+import com.google.ar.sceneform.Camera;
 import com.google.ar.sceneform.HitTestResult;
 import com.google.ar.sceneform.Node;
+import com.google.ar.sceneform.Sun;
 import com.google.ar.sceneform.math.Quaternion;
 import com.google.ar.sceneform.math.Vector3;
+import com.google.ar.sceneform.rendering.Color;
+import com.google.ar.sceneform.rendering.MaterialFactory;
 import com.google.ar.sceneform.rendering.ModelRenderable;
+import com.google.ar.sceneform.rendering.ShapeFactory;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
 
@@ -165,7 +170,10 @@ public class MainActivity extends AppCompatActivity {
         mFabClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mFabWidth.callOnClick();
+                resetLayout();
+                measure_height = false;
+                text.setText("Select width or height");
+                mFabMenu.callOnClick();
             }
         });
 
@@ -254,6 +262,10 @@ public class MainActivity extends AppCompatActivity {
                     }
                     myhit = hitResult;
 
+                    if (!measure_height && anchorNodes.size() % 2 == 0) {
+                        emptyNodes();
+                    }
+
                     // Create the Anchor.
                     Anchor anchor = hitResult.createAnchor();
 
@@ -277,12 +289,11 @@ public class MainActivity extends AppCompatActivity {
                             fl_measurement = getMetersBetweenAnchors(anchor1, anchor2);
                             text.setText("Width: " +
                                     form_numbers.format(fl_measurement));
-
                         }
                     } else {
                         emptyAnchors();
                         anchor1 = anchor;
-                        text.setText("Move the slider till the cube reaches the upper base");
+                        text.setText("Move the slider till the bar reaches the upper base");
                         sk_height_control.setEnabled(true);
                     }
 
@@ -293,38 +304,22 @@ public class MainActivity extends AppCompatActivity {
                     TransformableNode andy = new TransformableNode(arFragment.getTransformationSystem());
                     andy.setParent(anchorNode);
 
-                    if (!measure_height)
+                    if (!measure_height){
                         andy.setRenderable(andyRenderable);
+
+                        if(anchorNodes.size() % 2 == 0){
+                            int lastIndex = anchorNodes.size() -1;
+                            Vector3 pos1 = anchorNodes.get(lastIndex).getWorldPosition();
+                            Vector3 pos2 = anchorNodes.get(lastIndex - 1).getWorldPosition();
+                            lineBetweenPoints(pos1, pos2);
+                        }
+                    }
                     else
                         andy.setRenderable(andyRenderableCube);
 
                     andy.select();
                     andy.getScaleController().setEnabled(false);
                     andy.getTranslationController().setEnabled(false);
-
-//                    andy.setOnTapListener(new Node.OnTapListener(){
-//                        @Override
-//                        public void onTap(HitTestResult hitTestResult, MotionEvent motionEvent) {
-//                            Toast.makeText(MainActivity.this, "jfdlksafjdsa;", Toast.LENGTH_SHORT).show();
-//                            if (anchor1 != null && anchor2 != null) {
-//                                fl_measurement = getMetersBetweenAnchors(anchor1, anchor2);
-//                                text.setText("Width: " +
-//                                        form_numbers.format(fl_measurement));
-//                            }
-//                        }
-//                    });
-//
-//                    andy.addTransformChangedListener(new Node.TransformChangedListener(){
-//
-//                        @Override
-//                        public void onTransformChanged(Node node, Node node1) {
-//                            if (anchor1 != null && anchor2 != null) {
-//                                fl_measurement = getMetersBetweenAnchors(anchor1, anchor2);
-//                                text.setText("Width: " +
-//                                        form_numbers.format(fl_measurement));
-//                            }
-//                        }
-//                    });
                 });
 
 
@@ -437,6 +432,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void emptyNodes(){
+        List<Node> children = new ArrayList<>(arFragment.getArSceneView().getScene().getChildren());
+        for (Node node : children) {
+            if (node instanceof AnchorNode) {
+                if (((AnchorNode) node).getAnchor() != null) {
+                    ((AnchorNode) node).getAnchor().detach();
+                }
+            }
+            if (!(node instanceof Camera) && !(node instanceof Sun)) {
+                node.setParent(null);
+            }
+        }
+    }
+
     // Take screen of Main fragement Scene
     private void takeScreenshot(String filename) {
         try {
@@ -528,5 +537,30 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "Error writing screenshoot : " + e.toString(), Toast.LENGTH_SHORT).show();
         }
 
+    }
+
+
+    public void lineBetweenPoints(Vector3 point1, Vector3 point2) {
+        Node lineNode = new Node();
+
+        /* First, find the vector extending between the two points and define a look rotation in terms of this
+        Vector. */
+        final Vector3 difference = Vector3.subtract(point1, point2);
+        final Vector3 directionFromTopToBottom = difference.normalized();
+        final Quaternion rotationFromAToB =
+                Quaternion.lookRotation(directionFromTopToBottom, Vector3.up());
+        MaterialFactory.makeOpaqueWithColor(getApplicationContext(), new Color(255, 0, 0))
+                .thenAccept(
+                        material -> {
+                            ModelRenderable model = ShapeFactory.makeCube(
+                                    new Vector3(.01f, .01f, difference.length()),
+                                    Vector3.zero(), material);
+                            Node node = new Node();
+                            node.setParent(arFragment.getArSceneView().getScene());
+                            node.setRenderable(model);
+                            node.setWorldPosition(Vector3.add(point1, point2).scaled(.5f));
+                            node.setWorldRotation(rotationFromAToB);
+                        }
+                );
     }
 }
