@@ -289,31 +289,31 @@ public class MainActivity extends AppCompatActivity {
 
                     andy.select();
                     andy.getScaleController().setEnabled(false);
-                    andy.getTranslationController().setEnabled(true);
+                    andy.getTranslationController().setEnabled(false);
 
-                    andy.setOnTapListener(new Node.OnTapListener(){
-                        @Override
-                        public void onTap(HitTestResult hitTestResult, MotionEvent motionEvent) {
-                            Toast.makeText(MainActivity.this, "jfdlksafjdsa;", Toast.LENGTH_SHORT).show();
-                            if (anchor1 != null && anchor2 != null) {
-                                fl_measurement = getMetersBetweenAnchors(anchor1, anchor2);
-                                text.setText("Width: " +
-                                        form_numbers.format(fl_measurement));
-                            }
-                        }
-                    });
-
-                    andy.addTransformChangedListener(new Node.TransformChangedListener(){
-
-                        @Override
-                        public void onTransformChanged(Node node, Node node1) {
-                            if (anchor1 != null && anchor2 != null) {
-                                fl_measurement = getMetersBetweenAnchors(anchor1, anchor2);
-                                text.setText("Width: " +
-                                        form_numbers.format(fl_measurement));
-                            }
-                        }
-                    });
+//                    andy.setOnTapListener(new Node.OnTapListener(){
+//                        @Override
+//                        public void onTap(HitTestResult hitTestResult, MotionEvent motionEvent) {
+//                            Toast.makeText(MainActivity.this, "jfdlksafjdsa;", Toast.LENGTH_SHORT).show();
+//                            if (anchor1 != null && anchor2 != null) {
+//                                fl_measurement = getMetersBetweenAnchors(anchor1, anchor2);
+//                                text.setText("Width: " +
+//                                        form_numbers.format(fl_measurement));
+//                            }
+//                        }
+//                    });
+//
+//                    andy.addTransformChangedListener(new Node.TransformChangedListener(){
+//
+//                        @Override
+//                        public void onTransformChanged(Node node, Node node1) {
+//                            if (anchor1 != null && anchor2 != null) {
+//                                fl_measurement = getMetersBetweenAnchors(anchor1, anchor2);
+//                                text.setText("Width: " +
+//                                        form_numbers.format(fl_measurement));
+//                            }
+//                        }
+//                    });
                 });
 
 
