@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
     private SeekBar sk_height_control;
 
     List<AnchorNode> anchorNodes = new ArrayList<>();
+    List<Node> lineNodes = new ArrayList<>();
 
     private boolean measure_height = false;
     private ArrayList<String> arl_saved = new ArrayList<String>();
@@ -192,6 +193,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 resetLayout();
+                emptyNodes();
                 measure_height = true;
                 text.setText("Click the base of the object you want to measure");
                 mFabMenu.callOnClick();
@@ -217,12 +219,12 @@ public class MainActivity extends AppCompatActivity {
                 upDistance = progress;
                 fl_measurement = progress/100f;
                 text.setText("Height: " + form_numbers.format(fl_measurement));
-                myanchornode.setLocalScale(new Vector3(0.01f, progress/10f, 0.3f));
+                myanchornode.setLocalScale(new Vector3(0.1f, progress/10f, 0.3f));
                 //ascend(myanchornode, upDistance);
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
+            public void onStartTrackingTouch(SeekBar seekBar) {d
             }
 
             @Override
@@ -273,10 +275,10 @@ public class MainActivity extends AppCompatActivity {
                     AnchorNode anchorNode = new AnchorNode(anchor);
                     if (!measure_height) {
                         anchorNode.setLocalScale(new Vector3(1.0f, 1.0f, 1.0f));
+                        anchorNode.setLocalRotation(Quaternion.axisAngle(new Vector3(1.0f, 0f, 0f), 90));
                     } else
-                        anchorNode.setLocalScale(new Vector3(0.1f, 0.0001f, 0.1f));
+                        anchorNode.setLocalScale(new Vector3(0.25f, 0.01f, 0.25f));
 
-                    anchorNode.setLocalRotation(Quaternion.axisAngle(new Vector3(1.0f, 0f, 0f), 90));
                     anchorNode.setParent(arFragment.getArSceneView().getScene());
 
                     if (!measure_height) {
@@ -320,7 +322,27 @@ public class MainActivity extends AppCompatActivity {
 
                     andy.select();
                     andy.getScaleController().setEnabled(false);
-                    andy.getTranslationController().setEnabled(false);
+                    andy.getTranslationController().setEnabled(true);
+
+                    andy.setOnTouchListener(new Node.OnTouchListener() {
+                        @Override
+                        public boolean onTouch(HitTestResult hitTestResult, MotionEvent motionEvent) {
+                            if (!measure_height){
+                                if(anchorNodes.size() % 2 == 0){
+
+                                    emptyLineNodes();
+                                    int lastIndex = anchorNodes.size() -1;
+                                    Vector3 pos1 = anchorNodes.get(lastIndex).getWorldPosition();
+                                    Vector3 pos2 = anchorNodes.get(lastIndex - 1).getWorldPosition();
+                                    lineBetweenPoints(pos1, pos2);
+
+                                    text.setText("Width: " +
+                                            form_numbers.format(calcuateDistance(pos1, pos2)));
+                                }
+                            }
+                            return false;
+                        }
+                    });
                 });
 
 
@@ -330,6 +352,14 @@ public class MainActivity extends AppCompatActivity {
             params.setMargins(75, 0, 25, 25);
             sk_height_control.setLayoutParams(params);
         }
+    }
+
+    private float calcuateDistance(Vector3 pos1, Vector3 pos2){
+        float deltaX = pos1.x - pos2.x;
+        float deltaY = pos1.y - pos2.y;
+        float deltaZ = pos1.z - pos2.z;
+
+        return (float) Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
     }
 
     /**
@@ -436,6 +466,19 @@ public class MainActivity extends AppCompatActivity {
     private void emptyNodes(){
         List<Node> children = new ArrayList<>(arFragment.getArSceneView().getScene().getChildren());
         for (Node node : children) {
+            if (node instanceof AnchorNode) {
+                if (((AnchorNode) node).getAnchor() != null) {
+                    ((AnchorNode) node).getAnchor().detach();
+                }
+            }
+            if (!(node instanceof Camera) && !(node instanceof Sun)) {
+                node.setParent(null);
+            }
+        }
+    }
+
+    private void emptyLineNodes(){
+        for (Node node : lineNodes) {
             if (node instanceof AnchorNode) {
                 if (((AnchorNode) node).getAnchor() != null) {
                     ((AnchorNode) node).getAnchor().detach();
@@ -572,6 +615,7 @@ public class MainActivity extends AppCompatActivity {
                             node.setRenderable(model);
                             node.setWorldPosition(Vector3.add(point1, point2).scaled(.5f));
                             node.setWorldRotation(rotationFromAToB);
+                            lineNodes.add(node);
                         }
                 );
     }
