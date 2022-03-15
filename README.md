@@ -5,5 +5,5 @@
 <img src = "Screenshots/Screenshot_1.png" />
 <img src = "Screenshots/Screenshot_2.png" />
 
-### For Demo APK : [here](https://github.com/tarzan0420/AR-Measure-Mobilinq/blob/main/Demo/AR_mobilinq.apk)
-### Tutorial : [here](https://github.com/tarzan0420/AR-Measure-Mobilinq/blob/main/Demo/AR_mobilinq.mp4)
+### For Demo APK : [here](https://github.com/julian-medve/AR-Measure-Mobilinq/blob/main/Demo/AR_mobilinq.apk)
+### Tutorial : [here](https://github.com/julian-medve/AR-Measure-Mobilinq/blob/main/Demo/AR_mobilinq.mp4)
